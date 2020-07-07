@@ -32,15 +32,7 @@ $ php artisan migrate:refresh --seed
 
 $ php artisan serve
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-$ npm install  
-=======
 $ npm install (Frontend)
->>>>>>> f7e25dabf40b68c8d962339e26d4c6091bd2a7af
-=======
-$ npm install (Frontend)
->>>>>>> f7e25dabf40b68c8d962339e26d4c6091bd2a7af
 
 $ npm run dev
 
@@ -212,11 +204,59 @@ class Post extends JsonResource
 ...
 ```
 
+### Middlewares
+
+```php
+...
+class apiProtectedRoute extends BaseMiddleware
+{
+    /**
+     * Handle an incoming request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Closure  $next
+     * @return mixed
+     */
+    public function handle($request, Closure $next)
+    {
+      try {
+        $user = JWTAuth::parseToken()->authenticate();
+      } catch (\Exception $e) {
+        if($e instanceof \Tymon\JWTAuth\Exceptions\TokenInvalidException){
+          return response()->json(['status'=>'Token is Invalid!']);
+        }else if($e instanceof \Tymon\JWTAuth\Exceptions\TokenExpiredException) {
+          return response()->json(['status'=>'Token is Expired!']);
+        }else {
+          return response()->json(['status'=>'Authorization Token not found!']);
+        }
+      }
+
+        return $next($request);
+    }
+}
+...
+```
+
 ### Routes
 ```php
 ...
-Route::apiResource('posts','Api\PostController')
-    ->names(['index'   =>    'api.posts.index',]);
+Route::post('auth/login', 'Api\AuthController@login')->name('login');
+
+//Use of tokens in external systems...
+
+
+Route::group(['middleware'=>['apiJwt']], function() {
+  Route::apiResource('posts','Api\PostController')
+        ->names([
+          'index'   =>    'api.posts.index',
+          'show'    =>    'api.posts.show',
+          'store'   =>    'api.posts.store',
+          'update'  =>    'api.posts.update',
+          'destroy' =>    'api.posts.destroy'
+        ]);
+});
+
+Route::get('posts','Api\PostController@index');
 ...
 ```
 

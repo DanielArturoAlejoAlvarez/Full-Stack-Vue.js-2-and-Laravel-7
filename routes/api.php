@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Route;
     return $request->user();
 });*/
 
-<<<<<<< HEAD
+
 Route::post('auth/login', 'Api\AuthController@login')->name('login');
 
 //Use of tokens in external systems...
@@ -36,18 +36,3 @@ Route::group(['middleware'=>['apiJwt']], function() {
 });
 
 Route::get('posts','Api\PostController@index');
-=======
-//Route::resource('posts','Api\PostController')->except('create','edit');
-//Route::apiResource('posts','Api\PostController');
-
-//Use of tokens in external systems...
-
-Route::apiResource('posts','Api\PostController')
-    ->names([
-      'index'   =>    'api.posts.index',
-      // 'show'    =>    'api.posts.show',
-      // 'store'   =>    'api.posts.store',
-      // 'update'  =>    'api.posts.update',
-      // 'destroy' =>    'api.posts.destroy',
-    ]);
->>>>>>> f7e25dabf40b68c8d962339e26d4c6091bd2a7af
